@@ -67,9 +67,11 @@
                 .Cast<View>()
                 .Where(v => v.IsTemplate && v.AreGraphicsOverridesAllowed())
                 .OrderBy(v => v.Name);
-            ViewTemplates = new ObservableCollection<ViewTemplateWrapper>(
-                viewTemplates.Select(v => new ViewTemplateWrapper(v)));
-            OnPropertyChanged(nameof(ViewTemplates));
+            ViewTemplates = new ObservableCollection<ViewTemplateWrapper>();
+            foreach (var viewTemplateWrapper in viewTemplates.Select(v => new ViewTemplateWrapper(v)))
+            {
+                ViewTemplates.Add(viewTemplateWrapper);
+            }
         }
 
         private void Search()

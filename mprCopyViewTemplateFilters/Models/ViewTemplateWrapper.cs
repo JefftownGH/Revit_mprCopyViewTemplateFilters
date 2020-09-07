@@ -22,13 +22,12 @@
             NameUpperCase = Name.ToUpper();
 
             _filters = new ObservableCollection<FilterWrapper>();
+            Filters = new ReadOnlyObservableCollection<FilterWrapper>(_filters);
             var filterWrappers = viewTemplate.GetFilters().Select(id => new FilterWrapper(this, id));
             foreach (var filterWrapper in filterWrappers.OrderBy(f => f.Name))
             {
                 AddFilter(filterWrapper, FilterStatus.Exits);
             }
-
-            Filters = new ReadOnlyObservableCollection<FilterWrapper>(_filters);
         }
 
         /// <summary>
