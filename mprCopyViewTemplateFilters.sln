@@ -1,0 +1,51 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30413.136
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "mprCopyViewTemplateFilters", "mprCopyViewTemplateFilters\mprCopyViewTemplateFilters.csproj", "{E523C603-45AB-47FD-9A8F-5B40D5D8A43D}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "_build", "build\_build.csproj", "{D9B4CD63-5357-4081-B124-E4551157A3BB}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		R2017|x64 = R2017|x64
+		R2018|x64 = R2018|x64
+		R2019|x64 = R2019|x64
+		R2020|x64 = R2020|x64
+		R2021|x64 = R2021|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{E523C603-45AB-47FD-9A8F-5B40D5D8A43D}.Debug|x64.ActiveCfg = Debug|x64
+		{E523C603-45AB-47FD-9A8F-5B40D5D8A43D}.Debug|x64.Build.0 = Debug|x64
+		{E523C603-45AB-47FD-9A8F-5B40D5D8A43D}.R2017|x64.ActiveCfg = R2017|x64
+		{E523C603-45AB-47FD-9A8F-5B40D5D8A43D}.R2017|x64.Build.0 = R2017|x64
+		{E523C603-45AB-47FD-9A8F-5B40D5D8A43D}.R2018|x64.ActiveCfg = R2018|x64
+		{E523C603-45AB-47FD-9A8F-5B40D5D8A43D}.R2018|x64.Build.0 = R2018|x64
+		{E523C603-45AB-47FD-9A8F-5B40D5D8A43D}.R2019|x64.ActiveCfg = R2019|x64
+		{E523C603-45AB-47FD-9A8F-5B40D5D8A43D}.R2019|x64.Build.0 = R2019|x64
+		{E523C603-45AB-47FD-9A8F-5B40D5D8A43D}.R2020|x64.ActiveCfg = R2020|x64
+		{E523C603-45AB-47FD-9A8F-5B40D5D8A43D}.R2020|x64.Build.0 = R2020|x64
+		{E523C603-45AB-47FD-9A8F-5B40D5D8A43D}.R2021|x64.ActiveCfg = R2021|x64
+		{E523C603-45AB-47FD-9A8F-5B40D5D8A43D}.R2021|x64.Build.0 = R2021|x64
+		{D9B4CD63-5357-4081-B124-E4551157A3BB}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{D9B4CD63-5357-4081-B124-E4551157A3BB}.Debug|x64.Build.0 = Debug|Any CPU
+		{D9B4CD63-5357-4081-B124-E4551157A3BB}.R2017|x64.ActiveCfg = Release|Any CPU
+		{D9B4CD63-5357-4081-B124-E4551157A3BB}.R2017|x64.Build.0 = Release|Any CPU
+		{D9B4CD63-5357-4081-B124-E4551157A3BB}.R2018|x64.ActiveCfg = Release|Any CPU
+		{D9B4CD63-5357-4081-B124-E4551157A3BB}.R2018|x64.Build.0 = Release|Any CPU
+		{D9B4CD63-5357-4081-B124-E4551157A3BB}.R2019|x64.ActiveCfg = Release|Any CPU
+		{D9B4CD63-5357-4081-B124-E4551157A3BB}.R2019|x64.Build.0 = Release|Any CPU
+		{D9B4CD63-5357-4081-B124-E4551157A3BB}.R2020|x64.ActiveCfg = Release|Any CPU
+		{D9B4CD63-5357-4081-B124-E4551157A3BB}.R2020|x64.Build.0 = Release|Any CPU
+		{D9B4CD63-5357-4081-B124-E4551157A3BB}.R2021|x64.ActiveCfg = Release|Any CPU
+		{D9B4CD63-5357-4081-B124-E4551157A3BB}.R2021|x64.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {AA74AB85-39F6-46BB-823E-6B1BF1D7006F}
+	EndGlobalSection
+EndGlobal
