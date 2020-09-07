@@ -26,6 +26,7 @@
         public MainContext(Document doc)
         {
             _doc = doc;
+            ViewTemplates = new ObservableCollection<ViewTemplateWrapper>();
             Init();
         }
 
@@ -62,12 +63,14 @@
 
         private void Init()
         {
+            ViewTemplates.Clear();
+
             var viewTemplates = new FilteredElementCollector(_doc)
                 .OfClass(typeof(View))
                 .Cast<View>()
                 .Where(v => v.IsTemplate && v.AreGraphicsOverridesAllowed())
                 .OrderBy(v => v.Name);
-            ViewTemplates = new ObservableCollection<ViewTemplateWrapper>();
+            
             foreach (var viewTemplateWrapper in viewTemplates.Select(v => new ViewTemplateWrapper(v)))
             {
                 ViewTemplates.Add(viewTemplateWrapper);
