@@ -145,8 +145,11 @@
                         {
                             var graphicSettings =
                                 filter.OriginalParentTemplate.ViewTemplate.GetFilterOverrides(filter.FilterId);
+                            var filterVisibility =
+                                filter.OriginalParentTemplate.ViewTemplate.GetFilterVisibility(filter.FilterId);
                             filter.ParentTemplate.ViewTemplate.AddFilter(filter.FilterId);
                             filter.ParentTemplate.ViewTemplate.SetFilterOverrides(filter.FilterId, graphicSettings);
+                            filter.ParentTemplate.ViewTemplate.SetFilterVisibility(filter.FilterId, filterVisibility);
                         }
                         else if (filter.FilterStatus == FilterStatus.Remove)
                         {
