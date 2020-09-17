@@ -21,6 +21,7 @@
             <converters:BooleanToVisibilityConverter x:Key="TrueToVisible" TrueVisibility="Visible" FalseVisibility="Collapsed"/>
             <converters:BooleanToVisibilityConverter x:Key="FalseToVisible" TrueVisibility="Collapsed" FalseVisibility="Visible"/>
             <local:BooleanToVisibilityMultiConverter x:Key="BooleanToVisibilityMultiConverter"/>
+            <converters:EnumToIntConverter x:Key="EnumToIntConverter"/>
             <Viewbox x:Key="RemoveIcon" Width="24" Height="24" x:Shared="False">
                 <Canvas Width="24" Height="24">
                     <Path Fill="{DynamicResource ErrorBrush}" Data="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z" />
@@ -29,6 +30,30 @@
             <Viewbox x:Key="RestoreIcon" Width="24" Height="24" x:Shared="False">
                 <Canvas Width="24" Height="24">
                     <Path Fill="{DynamicResource BlackBrush}" Data="M13,3A9,9 0 0,0 4,12H1L4.89,15.89L4.96,16.03L9,12H6A7,7 0 0,1 13,5A7,7 0 0,1 20,12A7,7 0 0,1 13,19C11.07,19 9.32,18.21 8.06,16.94L6.64,18.36C8.27,20 10.5,21 13,21A9,9 0 0,0 22,12A9,9 0 0,0 13,3Z" />
+                </Canvas>
+            </Viewbox>
+            <Viewbox x:Key="CollapseTreeIcon" Width="24" Height="24" x:Shared="False">
+                <Canvas Width="24" Height="24">
+                    <Path Fill="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Button}, Path=Foreground}"
+                          Data="M14,4H4V14H2V4A2,2 0 0,1 4,2H14V4M18,6H8A2,2 0 0,0 6,8V18H8V8H18V6M22,12V20A2,2 0 0,1 20,22H12A2,2 0 0,1 10,20V12A2,2 0 0,1 12,10H20A2,2 0 0,1 22,12M20,15H12V17H20V15Z" />
+                </Canvas>
+            </Viewbox>
+            <Viewbox x:Key="ExpandTreeIcon" Width="24" Height="24" x:Shared="False">
+                <Canvas Width="24" Height="24">
+                    <Path Fill="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Button}, Path=Foreground}"
+                          Data="M18,8H8V18H6V8A2,2 0 0,1 8,6H18V8M14,2H4A2,2 0 0,0 2,4V14H4V4H14V2M22,12V20A2,2 0 0,1 20,22H12A2,2 0 0,1 10,20V12A2,2 0 0,1 12,10H20A2,2 0 0,1 22,12M20,15H17V12H15V15H12V17H15V20H17V17H20V15Z" />
+                </Canvas>
+            </Viewbox>
+            <Viewbox x:Key="CheckAllIcon" Width="24" Height="24" x:Shared="False">
+                <Canvas Width="24" Height="24">
+                    <Path Fill="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Button}, Path=Foreground}"
+                          Data="M20,16V10H22V16A2,2 0 0,1 20,18H8C6.89,18 6,17.1 6,16V4C6,2.89 6.89,2 8,2H16V4H8V16H20M10.91,7.08L14,10.17L20.59,3.58L22,5L14,13L9.5,8.5L10.91,7.08M16,20V22H4A2,2 0 0,1 2,20V7H4V20H16Z" />
+                </Canvas>
+            </Viewbox>
+            <Viewbox x:Key="UncheckAllIcon" Width="24" Height="24" x:Shared="False">
+                <Canvas Width="24" Height="24">
+                    <Path Fill="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Button}, Path=Foreground}"
+                          Data="M20,16V4H8V16H20M22,16A2,2 0 0,1 20,18H8C6.89,18 6,17.1 6,16V4C6,2.89 6.89,2 8,2H20A2,2 0 0,1 22,4V16M16,20V22H4A2,2 0 0,1 2,20V7H4V20H16Z" />
                 </Canvas>
             </Viewbox>
         </ResourceDictionary>
@@ -50,92 +75,177 @@
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
                 <!-- header -->
                 <TextBlock Grid.Row="0" HorizontalAlignment="Center" FontWeight="SemiBold" TextWrapping="Wrap"
                            Margin="{DynamicResource ModPlusDefaultMargin}"
                            Text="{Binding Source={StaticResource Lang}, XPath=h1}"/>
+                <!-- templates or views -->
+                <ComboBox Grid.Row="1"
+                          SelectedIndex="{Binding Path=SourceCollectionTypeOnLeft, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged,
+                    Converter={StaticResource EnumToIntConverter}, ConverterParameter={x:Type local:SourceCollectionType}}">
+                    <!-- templates -->
+                    <ComboBoxItem Content="{Binding Source={StaticResource Lang}, XPath=h14}"/>
+                    <!-- views -->
+                    <ComboBoxItem Content="{Binding Source={StaticResource Lang}, XPath=h15}"/>
+                </ComboBox>
+                <!-- ViewType group -->
+                <ComboBox Grid.Row="2"
+                          SelectedIndex="{Binding Path=ViewTypeGroupOnLeft, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged,
+                    Converter={StaticResource EnumToIntConverter}, ConverterParameter={x:Type models:ViewTypeGroup}}">
+                    <ComboBoxItem Content="{Binding Source={StaticResource Lang}, XPath=all}"/>
+                    <ComboBoxItem Content="{Binding Source={StaticResource Lang}, XPath=vtf1}"/>
+                    <ComboBoxItem Content="{Binding Source={StaticResource Lang}, XPath=vtf2}"/>
+                    <ComboBoxItem Content="{Binding Source={StaticResource Lang}, XPath=vtf3}"/>
+                    <ComboBoxItem Content="{Binding Source={StaticResource Lang}, XPath=vtf4}"/>
+                </ComboBox>
+
                 <!-- search -->
-                <TextBox Grid.Row="1"
+                <TextBox Grid.Row="3"
                          mps:HintAssist.Hint="{Binding Source={StaticResource Lang}, XPath=h3}"
                          mps:TextFieldAssist.ClearTextButton="True"
-                         Text="{Binding Path=SearchString, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                         Text="{Binding Path=SearchStringOnLeft, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                 <!-- tree -->
-                <TreeView Grid.Row="2" ItemsSource="{Binding Path=ViewTemplates}"
-                          BorderThickness="0" HorizontalContentAlignment="Stretch"
-                          VerticalAlignment="Stretch"
-                          mps:TreeViewAssist.ExpandAll="True"
-                          mps:RippleAssist.IsDisabled="True">
-                    <TreeView.ItemContainerStyle>
-                        <Style TargetType="{x:Type TreeViewItem}" BasedOn="{StaticResource ModPlusTreeViewItem}">
-                            <Setter Property="Visibility" Value="{Binding Path=Visibility}"/>
-                        </Style>
-                    </TreeView.ItemContainerStyle>
-                    <TreeView.ItemTemplate>
-                        <HierarchicalDataTemplate ItemsSource="{Binding Path=Filters}"
-                                                  DataType="models:ViewTemplateWrapper">
-                            <TextBlock Text="{Binding Path=Name}"/>
+                <Grid Grid.Row="4">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <!-- controls -->
+                    <StackPanel Grid.Column="0" Orientation="Vertical">
+                        <StackPanel.Resources>
+                            <Style TargetType="{x:Type Button}" BasedOn="{StaticResource ModPlusFlatButton}">
+                                <Setter Property="MinHeight" Value="0"/>
+                                <Setter Property="MinWidth" Value="0"/>
+                                <Setter Property="Padding" Value="2"/>
+                                <Setter Property="Margin" Value="4 4 0 0"/>
+                            </Style>
+                        </StackPanel.Resources>
+                        <Button Content="{StaticResource CollapseTreeIcon}"
+                                ToolTipService.InitialShowDelay="200"
+                                ToolTip="{Binding Source={StaticResource Lang}, XPath=h10}"
+                                Command="{Binding Path=CollapseAllOnLeftCommand}"/>
+                        <Button Content="{StaticResource ExpandTreeIcon}"
+                                ToolTipService.InitialShowDelay="200"
+                                ToolTip="{Binding Source={StaticResource Lang}, XPath=h11}"
+                                Command="{Binding Path=ExpandAllOnLeftCommand}"/>
+                    </StackPanel>
+                    <!-- tree -->
+                    <TreeView Grid.Column="1" ItemsSource="{Binding Path=LeftTreeCollection}"
+                              BorderThickness="0" HorizontalContentAlignment="Stretch"
+                              VerticalAlignment="Stretch" Margin="0 4 4 4"
+                              mps:TreeViewAssist.ExpandAll="True"
+                              mps:RippleAssist.IsDisabled="True">
+                        <TreeView.ItemContainerStyle>
+                            <Style TargetType="{x:Type TreeViewItem}" BasedOn="{StaticResource ModPlusTreeViewItem}">
+                                <Setter Property="Visibility" Value="{Binding Path=VisibilityOnLeft}"/>
+                                <Setter Property="IsExpanded" Value="{Binding Path=IsExpandOnLeft}"/>
+                            </Style>
+                        </TreeView.ItemContainerStyle>
+                        <TreeView.ItemTemplate>
+                            <HierarchicalDataTemplate ItemsSource="{Binding Path=Filters}"
+                                                      DataType="models:ViewWrapper">
 
-                            <HierarchicalDataTemplate.ItemTemplate>
-                                <DataTemplate DataType="models:FilterWrapper">
-                                    <Grid>
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="Auto"/>
-                                            <ColumnDefinition Width="*"/>
-                                            <ColumnDefinition Width="Auto"/>
-                                        </Grid.ColumnDefinitions>
-                                        <Border Grid.Column="0" Background="{DynamicResource SuccessBrush}"
-                                                Visibility="{Binding Path=IsNewPointerVisibility}"
-                                                ToolTip="{Binding Source={StaticResource Lang}, XPath=h5}"
-                                                ToolTipService.InitialShowDelay="200"
-                                                Width="5" Margin="0 0 5 0"/>
-                                        <Border Grid.Column="0" Background="{DynamicResource ErrorBrush}"
-                                                ToolTip="{Binding Source={StaticResource Lang}, XPath=h6}"
-                                                ToolTipService.InitialShowDelay="200"
-                                                Visibility="{Binding Path=IsRemovePointerVisibility}"
-                                                Width="5" Margin="0 0 5 0"/>
-                                        <CheckBox Grid.Column="1" Margin="0" VerticalAlignment="Center"
-                                                  Visibility="{Binding Path=IsCheckBoxVisible, Converter={StaticResource TrueToVisible}}"
-                                                  IsChecked="{Binding Path=IsChecked, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
-                                            <TextBlock Text="{Binding Path=Name}"/>
-                                        </CheckBox>
-                                        <TextBlock Grid.Column="1" Text="{Binding Path=Name}" VerticalAlignment="Center"
-                                                   Visibility="{Binding Path=IsCheckBoxVisible, Converter={StaticResource FalseToVisible}}"/>
-                                        <!-- remove -->
-                                        <Button Grid.Column="2" Style="{DynamicResource ModPlusFlatButton}"
-                                                MinHeight="0" MinWidth="0" Padding="0" Margin="0"
-                                                ToolTip="{Binding Source={StaticResource Lang}, XPath=h7}"
-                                                ToolTipService.InitialShowDelay="200"
-                                                Content="{StaticResource RemoveIcon}"
-                                                Command="{Binding Path=RemoveCommand}">
-                                            <Button.Visibility>
-                                                <MultiBinding Converter="{StaticResource BooleanToVisibilityMultiConverter}">
-                                                    <Binding RelativeSource="{RelativeSource FindAncestor, AncestorType=TreeViewItem}" Path="IsMouseOver"/>
-                                                    <Binding Path="CanRemove"/>
-                                                </MultiBinding>
-                                            </Button.Visibility>
-                                        </Button>
-                                        <!-- restore -->
-                                        <Button Grid.Column="2" Style="{DynamicResource ModPlusFlatButton}"
-                                                MinHeight="0" MinWidth="0" Padding="0" Margin="0"
-                                                ToolTip="{Binding Source={StaticResource Lang}, XPath=h8}"
-                                                ToolTipService.InitialShowDelay="200"
-                                                Content="{StaticResource RestoreIcon}"
-                                                Command="{Binding Path=RestoreCommand}">
-                                            <Button.Visibility>
-                                                <MultiBinding Converter="{StaticResource BooleanToVisibilityMultiConverter}">
-                                                    <Binding RelativeSource="{RelativeSource FindAncestor, AncestorType=TreeViewItem}" Path="IsMouseOver"/>
-                                                    <Binding Path="CanRestore"/>
-                                                </MultiBinding>
-                                            </Button.Visibility>
-                                        </Button>
-                                    </Grid>
-                                </DataTemplate>
-                            </HierarchicalDataTemplate.ItemTemplate>
-                        </HierarchicalDataTemplate>
-                    </TreeView.ItemTemplate>
-                </TreeView>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Grid.Column="0" Text="{Binding Path=Name}" VerticalAlignment="Center"/>
+                                    <!-- check all filters -->
+                                    <Button Grid.Column="1" Style="{DynamicResource ModPlusFlatButton}"
+                                            MinHeight="0" MinWidth="0" Padding="0" Margin="0 0 4 0"
+                                            ToolTip="{Binding Source={StaticResource Lang}, XPath=h12}"
+                                            ToolTipService.InitialShowDelay="200"
+                                            Content="{StaticResource CheckAllIcon}"
+                                            Command="{Binding Path=CheckAllFiltersCommand}">
+                                        <Button.Visibility>
+                                            <MultiBinding Converter="{StaticResource BooleanToVisibilityMultiConverter}">
+                                                <Binding RelativeSource="{RelativeSource FindAncestor, AncestorType=TreeViewItem}" Path="IsMouseOver"/>
+                                                <Binding Path="CanChangeCheckStatusForFilters"/>
+                                            </MultiBinding>
+                                        </Button.Visibility>
+                                    </Button>
+                                    <!-- uncheck all filters -->
+                                    <Button Grid.Column="2" Style="{DynamicResource ModPlusFlatButton}"
+                                            MinHeight="0" MinWidth="0" Padding="0" Margin="0"
+                                            ToolTip="{Binding Source={StaticResource Lang}, XPath=h13}"
+                                            ToolTipService.InitialShowDelay="200"
+                                            Content="{StaticResource UncheckAllIcon}"
+                                            Command="{Binding Path=UncheckAllFiltersCommand}">
+                                        <Button.Visibility>
+                                            <MultiBinding Converter="{StaticResource BooleanToVisibilityMultiConverter}">
+                                                <Binding RelativeSource="{RelativeSource FindAncestor, AncestorType=TreeViewItem}" Path="IsMouseOver"/>
+                                                <Binding Path="CanChangeCheckStatusForFilters"/>
+                                            </MultiBinding>
+                                        </Button.Visibility>
+                                    </Button>
+                                </Grid>
+
+                                <HierarchicalDataTemplate.ItemTemplate>
+                                    <DataTemplate DataType="models:FilterWrapper">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto"/>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                            </Grid.ColumnDefinitions>
+                                            <Border Grid.Column="0" Background="{DynamicResource SuccessBrush}"
+                                                    Visibility="{Binding Path=IsNewPointerVisibility}"
+                                                    ToolTip="{Binding Source={StaticResource Lang}, XPath=h5}"
+                                                    ToolTipService.InitialShowDelay="200"
+                                                    Width="5" Margin="0 0 5 0"/>
+                                            <Border Grid.Column="0" Background="{DynamicResource ErrorBrush}"
+                                                    ToolTip="{Binding Source={StaticResource Lang}, XPath=h6}"
+                                                    ToolTipService.InitialShowDelay="200"
+                                                    Visibility="{Binding Path=IsRemovePointerVisibility}"
+                                                    Width="5" Margin="0 0 5 0"/>
+                                            <CheckBox Grid.Column="1" Margin="0" VerticalAlignment="Center"
+                                                      Visibility="{Binding Path=IsCheckBoxVisible, Converter={StaticResource TrueToVisible}}"
+                                                      IsChecked="{Binding Path=IsChecked, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                                                <TextBlock Text="{Binding Path=Name}"/>
+                                            </CheckBox>
+                                            <TextBlock Grid.Column="1" Text="{Binding Path=Name}" VerticalAlignment="Center"
+                                                       Visibility="{Binding Path=IsCheckBoxVisible, Converter={StaticResource FalseToVisible}}"/>
+                                            <!-- remove -->
+                                            <Button Grid.Column="2" Style="{DynamicResource ModPlusFlatButton}"
+                                                    MinHeight="0" MinWidth="0" Padding="0" Margin="0"
+                                                    ToolTip="{Binding Source={StaticResource Lang}, XPath=h7}"
+                                                    ToolTipService.InitialShowDelay="200"
+                                                    Content="{StaticResource RemoveIcon}"
+                                                    Command="{Binding Path=RemoveCommand}">
+                                                <Button.Visibility>
+                                                    <MultiBinding Converter="{StaticResource BooleanToVisibilityMultiConverter}">
+                                                        <Binding RelativeSource="{RelativeSource FindAncestor, AncestorType=TreeViewItem}" Path="IsMouseOver"/>
+                                                        <Binding Path="CanRemove"/>
+                                                    </MultiBinding>
+                                                </Button.Visibility>
+                                            </Button>
+                                            <!-- restore -->
+                                            <Button Grid.Column="2" Style="{DynamicResource ModPlusFlatButton}"
+                                                    MinHeight="0" MinWidth="0" Padding="0" Margin="0"
+                                                    ToolTip="{Binding Source={StaticResource Lang}, XPath=h8}"
+                                                    ToolTipService.InitialShowDelay="200"
+                                                    Content="{StaticResource RestoreIcon}"
+                                                    Command="{Binding Path=RestoreCommand}">
+                                                <Button.Visibility>
+                                                    <MultiBinding Converter="{StaticResource BooleanToVisibilityMultiConverter}">
+                                                        <Binding RelativeSource="{RelativeSource FindAncestor, AncestorType=TreeViewItem}" Path="IsMouseOver"/>
+                                                        <Binding Path="CanRestore"/>
+                                                    </MultiBinding>
+                                                </Button.Visibility>
+                                            </Button>
+                                        </Grid>
+                                    </DataTemplate>
+                                </HierarchicalDataTemplate.ItemTemplate>
+                            </HierarchicalDataTemplate>
+                        </TreeView.ItemTemplate>
+                    </TreeView>
+                </Grid>
             </Grid>
         </mps:Card>
 
@@ -165,79 +275,147 @@
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
                 <!-- header -->
                 <TextBlock Grid.Row="0" HorizontalAlignment="Center" FontWeight="SemiBold" TextWrapping="Wrap"
                            Margin="{DynamicResource ModPlusDefaultMargin}"
-                           Text="{Binding Source={StaticResource Lang}, XPath=h2}"/>
-                <!-- tree -->
-                <TreeView Grid.Row="1" ItemsSource="{Binding Path=ViewTemplates}"
-                          BorderThickness="0" HorizontalContentAlignment="Stretch"
-                          VerticalAlignment="Stretch"
-                          mps:TreeViewAssist.ExpandAll="True"
-                          mps:RippleAssist.IsDisabled="True">
-                    <TreeView.ItemTemplate>
-                        <HierarchicalDataTemplate ItemsSource="{Binding Path=Filters}"
-                                                  DataType="models:ViewTemplateWrapper">
-                            <CheckBox Margin="0"
-                                      IsChecked="{Binding Path=IsChecked, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
-                                <TextBlock Text="{Binding Path=Name}"/>
-                            </CheckBox>
+                           Text="{Binding Path=RightSideHeader}"/>
+                <!-- templates or views -->
+                <ComboBox Grid.Row="1"
+                          SelectedIndex="{Binding Path=SourceCollectionTypeOnRight, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged,
+                    Converter={StaticResource EnumToIntConverter}, ConverterParameter={x:Type local:SourceCollectionType}}">
+                    <!-- templates -->
+                    <ComboBoxItem Content="{Binding Source={StaticResource Lang}, XPath=h14}"/>
+                    <!-- views -->
+                    <ComboBoxItem Content="{Binding Source={StaticResource Lang}, XPath=h15}"/>
+                </ComboBox>
+                <!-- ViewType group -->
+                <ComboBox Grid.Row="2"
+                          SelectedIndex="{Binding Path=ViewTypeGroupOnRight, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged,
+                    Converter={StaticResource EnumToIntConverter}, ConverterParameter={x:Type models:ViewTypeGroup}}">
+                    <ComboBoxItem Content="{Binding Source={StaticResource Lang}, XPath=all}"/>
+                    <ComboBoxItem Content="{Binding Source={StaticResource Lang}, XPath=vtf1}"/>
+                    <ComboBoxItem Content="{Binding Source={StaticResource Lang}, XPath=vtf2}"/>
+                    <ComboBoxItem Content="{Binding Source={StaticResource Lang}, XPath=vtf3}"/>
+                    <ComboBoxItem Content="{Binding Source={StaticResource Lang}, XPath=vtf4}"/>
+                </ComboBox>
 
-                            <HierarchicalDataTemplate.ItemTemplate>
-                                <DataTemplate DataType="models:FilterWrapper">
-                                    <Grid>
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="Auto"/>
-                                            <ColumnDefinition Width="*"/>
-                                            <ColumnDefinition Width="Auto"/>
-                                        </Grid.ColumnDefinitions>
-                                        <Border Grid.Column="0" Background="{DynamicResource SuccessBrush}"
-                                                ToolTip="{Binding Source={StaticResource Lang}, XPath=h5}"
-                                                ToolTipService.InitialShowDelay="200"
-                                                Visibility="{Binding Path=IsNewPointerVisibility}"
-                                                Width="5" Margin="0 0 5 0"/>
-                                        <Border Grid.Column="0" Background="{DynamicResource ErrorBrush}"
-                                                ToolTip="{Binding Source={StaticResource Lang}, XPath=h6}"
-                                                ToolTipService.InitialShowDelay="200"
-                                                Visibility="{Binding Path=IsRemovePointerVisibility}"
-                                                Width="5" Margin="0 0 5 0"/>
-                                        <TextBlock Grid.Column="1" Text="{Binding Path=Name}" VerticalAlignment="Center" />
-                                        <!-- remove -->
-                                        <Button Grid.Column="2" Style="{DynamicResource ModPlusFlatButton}"
-                                                MinHeight="0" MinWidth="0" Padding="0" Margin="0"
-                                                ToolTip="{Binding Source={StaticResource Lang}, XPath=h7}"
-                                                ToolTipService.InitialShowDelay="200"
-                                                Content="{StaticResource RemoveIcon}"
-                                                Command="{Binding Path=RemoveCommand}">
-                                            <Button.Visibility>
-                                                <MultiBinding Converter="{StaticResource BooleanToVisibilityMultiConverter}">
-                                                    <Binding RelativeSource="{RelativeSource FindAncestor, AncestorType=TreeViewItem}" Path="IsMouseOver"/>
-                                                    <Binding Path="CanRemove"/>
-                                                </MultiBinding>
-                                            </Button.Visibility>
-                                        </Button>
-                                        <!-- restore -->
-                                        <Button Grid.Column="2" Style="{DynamicResource ModPlusFlatButton}"
-                                                MinHeight="0" MinWidth="0" Padding="0" Margin="0"
-                                                ToolTip="{Binding Source={StaticResource Lang}, XPath=h8}"
-                                                ToolTipService.InitialShowDelay="200"
-                                                Content="{StaticResource RestoreIcon}"
-                                                Command="{Binding Path=RestoreCommand}">
-                                            <Button.Visibility>
-                                                <MultiBinding Converter="{StaticResource BooleanToVisibilityMultiConverter}">
-                                                    <Binding RelativeSource="{RelativeSource FindAncestor, AncestorType=TreeViewItem}" Path="IsMouseOver"/>
-                                                    <Binding Path="CanRestore"/>
-                                                </MultiBinding>
-                                            </Button.Visibility>
-                                        </Button>
-                                    </Grid>
-                                </DataTemplate>
-                            </HierarchicalDataTemplate.ItemTemplate>
-                        </HierarchicalDataTemplate>
-                    </TreeView.ItemTemplate>
-                </TreeView>
+                <!-- search -->
+                <TextBox Grid.Row="3"
+                         mps:HintAssist.Hint="{Binding Source={StaticResource Lang}, XPath=h3}"
+                         mps:TextFieldAssist.ClearTextButton="True"
+                         Text="{Binding Path=SearchStringOnRight, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                <!-- tree -->
+                <Grid Grid.Row="4">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <!-- tree -->
+                    <TreeView Grid.Column="0" ItemsSource="{Binding Path=RightTreeCollection}"
+                              BorderThickness="0" HorizontalContentAlignment="Stretch"
+                              VerticalAlignment="Stretch"
+                              mps:TreeViewAssist.ExpandAll="True"
+                              mps:RippleAssist.IsDisabled="True">
+                        <TreeView.ItemContainerStyle>
+                            <Style TargetType="{x:Type TreeViewItem}" BasedOn="{StaticResource ModPlusTreeViewItem}">
+                                <Setter Property="Visibility" Value="{Binding Path=VisibilityOnRight}"/>
+                                <Setter Property="IsExpanded" Value="{Binding Path=IsExpandOnRight}"/>
+                            </Style>
+                        </TreeView.ItemContainerStyle>
+                        <TreeView.ItemTemplate>
+                            <HierarchicalDataTemplate ItemsSource="{Binding Path=Filters}"
+                                                      DataType="models:ViewWrapper">
+                                <CheckBox Margin="0"
+                                          IsChecked="{Binding Path=IsChecked, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                                    <TextBlock Text="{Binding Path=Name}"/>
+                                </CheckBox>
+
+                                <HierarchicalDataTemplate.ItemTemplate>
+                                    <DataTemplate DataType="models:FilterWrapper">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto"/>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                            </Grid.ColumnDefinitions>
+                                            <Border Grid.Column="0" Background="{DynamicResource SuccessBrush}"
+                                                    ToolTip="{Binding Source={StaticResource Lang}, XPath=h5}"
+                                                    ToolTipService.InitialShowDelay="200"
+                                                    Visibility="{Binding Path=IsNewPointerVisibility}"
+                                                    Width="5" Margin="0 0 5 0"/>
+                                            <Border Grid.Column="0" Background="{DynamicResource ErrorBrush}"
+                                                    ToolTip="{Binding Source={StaticResource Lang}, XPath=h6}"
+                                                    ToolTipService.InitialShowDelay="200"
+                                                    Visibility="{Binding Path=IsRemovePointerVisibility}"
+                                                    Width="5" Margin="0 0 5 0"/>
+                                            <TextBlock Grid.Column="1" Text="{Binding Path=Name}" VerticalAlignment="Center" />
+                                            <!-- remove -->
+                                            <Button Grid.Column="2" Style="{DynamicResource ModPlusFlatButton}"
+                                                    MinHeight="0" MinWidth="0" Padding="0" Margin="0"
+                                                    ToolTip="{Binding Source={StaticResource Lang}, XPath=h7}"
+                                                    ToolTipService.InitialShowDelay="200"
+                                                    Content="{StaticResource RemoveIcon}"
+                                                    Command="{Binding Path=RemoveCommand}">
+                                                <Button.Visibility>
+                                                    <MultiBinding Converter="{StaticResource BooleanToVisibilityMultiConverter}">
+                                                        <Binding RelativeSource="{RelativeSource FindAncestor, AncestorType=TreeViewItem}" Path="IsMouseOver"/>
+                                                        <Binding Path="CanRemove"/>
+                                                    </MultiBinding>
+                                                </Button.Visibility>
+                                            </Button>
+                                            <!-- restore -->
+                                            <Button Grid.Column="2" Style="{DynamicResource ModPlusFlatButton}"
+                                                    MinHeight="0" MinWidth="0" Padding="0" Margin="0"
+                                                    ToolTip="{Binding Source={StaticResource Lang}, XPath=h8}"
+                                                    ToolTipService.InitialShowDelay="200"
+                                                    Content="{StaticResource RestoreIcon}"
+                                                    Command="{Binding Path=RestoreCommand}">
+                                                <Button.Visibility>
+                                                    <MultiBinding Converter="{StaticResource BooleanToVisibilityMultiConverter}">
+                                                        <Binding RelativeSource="{RelativeSource FindAncestor, AncestorType=TreeViewItem}" Path="IsMouseOver"/>
+                                                        <Binding Path="CanRestore"/>
+                                                    </MultiBinding>
+                                                </Button.Visibility>
+                                            </Button>
+                                        </Grid>
+                                    </DataTemplate>
+                                </HierarchicalDataTemplate.ItemTemplate>
+                            </HierarchicalDataTemplate>
+                        </TreeView.ItemTemplate>
+                    </TreeView>
+                    <!-- controls -->
+                    <StackPanel Grid.Column="1" Orientation="Vertical">
+                        <StackPanel.Resources>
+                            <Style TargetType="{x:Type Button}" BasedOn="{StaticResource ModPlusFlatButton}">
+                                <Setter Property="MinHeight" Value="0"/>
+                                <Setter Property="MinWidth" Value="0"/>
+                                <Setter Property="Padding" Value="2"/>
+                                <Setter Property="Margin" Value="0 4 4 0"/>
+                            </Style>
+                        </StackPanel.Resources>
+                        <Button Content="{StaticResource CollapseTreeIcon}"
+                                ToolTipService.InitialShowDelay="200"
+                                ToolTip="{Binding Source={StaticResource Lang}, XPath=h10}"
+                                Command="{Binding Path=CollapseAllOnRightCommand}"/>
+                        <Button Content="{StaticResource ExpandTreeIcon}"
+                                ToolTipService.InitialShowDelay="200"
+                                ToolTip="{Binding Source={StaticResource Lang}, XPath=h11}"
+                                Command="{Binding Path=ExpandAllOnRightCommand}"/>
+                        <Button Content="{StaticResource CheckAllIcon}"
+                                ToolTipService.InitialShowDelay="200"
+                                ToolTip="{Binding Source={StaticResource Lang}, XPath=h12}"
+                                Command="{Binding Path=CheckAllOnRightCommand}"/>
+                        <Button Content="{StaticResource UncheckAllIcon}"
+                                ToolTipService.InitialShowDelay="200"
+                                ToolTip="{Binding Source={StaticResource Lang}, XPath=h13}"
+                                Command="{Binding Path=UncheckAllOnRightCommand}"/>
+                    </StackPanel>
+                </Grid>
             </Grid>
         </mps:Card>
 

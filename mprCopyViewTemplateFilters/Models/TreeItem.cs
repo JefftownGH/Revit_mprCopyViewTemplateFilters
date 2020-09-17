@@ -8,20 +8,68 @@
     /// </summary>
     public abstract class TreeItem : VmBase
     {
-        private Visibility _visibility;
+        private Visibility _visibilityOnLeft;
+        private Visibility _visibilityOnRight;
+        private bool _isExpandOnLeft = true;
+        private bool _isExpandOnRight = true;
         private bool _isChecked;
 
         /// <summary>
-        /// Видимость элемента в дереве
+        /// Видимость элемента в дереве в левом дереве
         /// </summary>
-        public Visibility Visibility
+        public Visibility VisibilityOnLeft
         {
-            get => _visibility;
+            get => _visibilityOnLeft;
             set
             {
-                if (_visibility == value)
+                if (_visibilityOnLeft == value)
                     return;
-                _visibility = value;
+                _visibilityOnLeft = value;
+                OnPropertyChanged();
+            }
+        }
+
+        /// <summary>
+        /// Видимость элемента в дереве в правом дереве
+        /// </summary>
+        public Visibility VisibilityOnRight
+        {
+            get => _visibilityOnRight;
+            set
+            {
+                if (_visibilityOnRight == value)
+                    return;
+                _visibilityOnRight = value;
+                OnPropertyChanged();
+            }
+        }
+
+        /// <summary>
+        /// Развернут ли узел дерева в левом дереве
+        /// </summary>
+        public bool IsExpandOnLeft
+        {
+            get => _isExpandOnLeft;
+            set
+            {
+                if (_isExpandOnLeft == value)
+                    return;
+                _isExpandOnLeft = value;
+                OnPropertyChanged();
+            }
+        }
+
+        /// <summary>
+        /// Развернут ли узел дерева в правом дереве
+        /// </summary>
+        public bool IsExpandOnRight
+        {
+            get => _isExpandOnRight;
+            set
+            {
+                if (_isExpandOnRight == value)
+                    return;
+                _isExpandOnRight = value;
                 OnPropertyChanged();
             }
         }

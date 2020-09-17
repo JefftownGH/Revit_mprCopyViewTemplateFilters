@@ -15,40 +15,40 @@
         /// <summary>
         /// Initializes a new instance of the <see cref="FilterWrapper"/> class.
         /// </summary>
-        /// <param name="parentTemplate">Родительский шаблон</param>
+        /// <param name="parent">Родительский шаблон</param>
         /// <param name="filterId">Идентификатор фильтра</param>
-        public FilterWrapper(ViewTemplateWrapper parentTemplate, ElementId filterId)
+        public FilterWrapper(ViewWrapper parent, ElementId filterId)
         {
-            OriginalParentTemplate = parentTemplate;
-            ParentTemplate = parentTemplate;
+            OriginalParent = parent;
+            Parent = parent;
             FilterId = filterId;
-            Name = parentTemplate.ViewTemplate.Document.GetElement(filterId).Name;
+            Name = parent.View.Document.GetElement(filterId).Name;
             NameUpperCase = Name.ToUpper();
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="FilterWrapper"/> class.
         /// </summary>
-        /// <param name="parentTemplate">Родительский шаблон</param>
+        /// <param name="parent">Родительский шаблон</param>
         /// <param name="filter">Фильтр-исходник</param>
-        public FilterWrapper(ViewTemplateWrapper parentTemplate, FilterWrapper filter)
+        public FilterWrapper(ViewWrapper parent, FilterWrapper filter)
         {
             FilterId = filter.FilterId;
             Name = filter.Name;
             NameUpperCase = filter.NameUpperCase;
-            OriginalParentTemplate = filter.OriginalParentTemplate;
-            ParentTemplate = parentTemplate;
+            OriginalParent = filter.OriginalParent;
+            Parent = parent;
         }
 
         /// <summary>
         /// Исходный родительский шаблон
         /// </summary>
-        public ViewTemplateWrapper OriginalParentTemplate { get; }
+        public ViewWrapper OriginalParent { get; }
 
         /// <summary>
         /// Родительский шаблон
         /// </summary>
-        public ViewTemplateWrapper ParentTemplate { get; set; }
+        public ViewWrapper Parent { get; set; }
 
         /// <summary>
         /// Идентификатор фильтра
@@ -115,7 +115,7 @@
         /// <summary>
         /// Команда "Удалить фильтр"
         /// </summary>
-        public ICommand RemoveCommand => new RelayCommandWithoutParameter(() => ParentTemplate.RemoveFilter(this));
+        public ICommand RemoveCommand => new RelayCommandWithoutParameter(() => Parent.RemoveFilter(this));
 
         /// <summary>
         /// Команда "Восстановить (отменить статус "Удаляемый")"

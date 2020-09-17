@@ -16,8 +16,19 @@
     /// </summary>
     public class MainContext : VmBase
     {
+        private readonly ViewType[] _allowedViewTypes = new[]
+        {
+            ViewType.ThreeD, ViewType.Walkthrough, ViewType.CeilingPlan, ViewType.Elevation, ViewType.Section,
+            ViewType.Detail, ViewType.FloorPlan, ViewType.EngineeringPlan, ViewType.AreaPlan
+        };
+
         private readonly Document _doc;
-        private string _searchString;
+        private string _searchStringOnLeft = string.Empty;
+        private string _searchStringOnRight;
+        private ViewTypeGroup _viewTypeGroupOnLeft;
+        private ViewTypeGroup _viewTypeGroupOnRight;
+        private SourceCollectionType _sourceCollectionTypeOnLeft;
+        private SourceCollectionType _sourceCollectionTypeOnRight;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MainContext"/> class.
@@ -26,30 +37,138 @@
         public MainContext(Document doc)
         {
             _doc = doc;
-            ViewTemplates = new ObservableCollection<ViewTemplateWrapper>();
+            ViewTemplates = new ObservableCollection<ViewWrapper>();
+            Views = new ObservableCollection<ViewWrapper>();
             Init();
         }
 
         /// <summary>
         /// Шаблоны видов
         /// </summary>
-        public ObservableCollection<ViewTemplateWrapper> ViewTemplates { get; private set; }
+        public ObservableCollection<ViewWrapper> ViewTemplates { get; }
 
         /// <summary>
-        /// Строка для поиска
+        /// Обычные виды
         /// </summary>
-        public string SearchString
+        public ObservableCollection<ViewWrapper> Views { get; }
+
+        /// <summary>
+        /// Коллекция в левом дереве
+        /// </summary>
+        public ObservableCollection<ViewWrapper> LeftTreeCollection =>
+            SourceCollectionTypeOnLeft == SourceCollectionType.Templates ? ViewTemplates : Views;
+
+        /// <summary>
+        /// Коллекция в правом дереве
+        /// </summary>
+        public ObservableCollection<ViewWrapper> RightTreeCollection =>
+            SourceCollectionTypeOnRight == SourceCollectionType.Templates ? ViewTemplates : Views;
+
+        /// <summary>
+        /// Тип коллекции источника слева
+        /// </summary>
+        public SourceCollectionType SourceCollectionTypeOnLeft
         {
-            get => _searchString;
+            get => _sourceCollectionTypeOnLeft;
             set
             {
-                if (_searchString == value)
+                if (_sourceCollectionTypeOnLeft == value)
                     return;
-                _searchString = value;
+                _sourceCollectionTypeOnLeft = value;
                 OnPropertyChanged();
-                Search();
+                OnPropertyChanged(nameof(LeftTreeCollection));
+                Search(true);
             }
         }
+
+        /// <summary>
+        /// Тип коллекции-источника справа
+        /// </summary>
+        public SourceCollectionType SourceCollectionTypeOnRight
+        {
+            get => _sourceCollectionTypeOnRight;
+            set
+            {
+                if (_sourceCollectionTypeOnRight == value)
+                    return;
+                _sourceCollectionTypeOnRight = value;
+                OnPropertyChanged();
+                OnPropertyChanged(nameof(RightTreeCollection));
+                OnPropertyChanged(nameof(RightSideHeader));
+                Search(false);
+            }
+        }
+
+        /// <summary>
+        /// Строка для поиска в левом дереве
+        /// </summary>
+        public string SearchStringOnLeft
+        {
+            get => _searchStringOnLeft;
+            set
+            {
+                if (_searchStringOnLeft == value)
+                    return;
+                _searchStringOnLeft = value;
+                OnPropertyChanged();
+                Search(true);
+            }
+        }
+
+        /// <summary>
+        /// Строка для поиска в правом дереве
+        /// </summary>
+        public string SearchStringOnRight
+        {
+            get => _searchStringOnRight;
+            set
+            {
+                if (_searchStringOnRight == value)
+                    return;
+                _searchStringOnRight = value;
+                OnPropertyChanged();
+                Search(false);
+            }
+        }
+
+        /// <summary>
+        /// Группа по типу вида слева
+        /// </summary>
+        public ViewTypeGroup ViewTypeGroupOnLeft
+        {
+            get => _viewTypeGroupOnLeft;
+            set
+            {
+                if (_viewTypeGroupOnLeft == value)
+                    return;
+                _viewTypeGroupOnLeft = value;
+                OnPropertyChanged();
+                Search(true);
+            }
+        }
+
+        /// <summary>
+        /// Группа по типу вида справа
+        /// </summary>
+        public ViewTypeGroup ViewTypeGroupOnRight
+        {
+            get => _viewTypeGroupOnRight;
+            set
+            {
+                if (_viewTypeGroupOnRight == value)
+                    return;
+                _viewTypeGroupOnRight = value;
+                OnPropertyChanged();
+                Search(false);
+            }
+        }
+
+        /// <summary>
+        /// Заголовок правой зоны
+        /// </summary>
+        public string RightSideHeader => SourceCollectionTypeOnRight == SourceCollectionType.Templates
+            ? Language.GetItem(new ModPlusConnector().Name, "h2")
+            : Language.GetItem(new ModPlusConnector().Name, "h16");
 
         /// <summary>
         /// Команда "Применить"
@@ -61,6 +180,72 @@
         /// </summary>
         public ICommand CopyCheckedCommand => new RelayCommandWithoutParameter(CopyChecked);
 
+        /// <summary>
+        /// Свернуть все узлы в левом дереве
+        /// </summary>
+        public ICommand CollapseAllOnLeftCommand => new RelayCommandWithoutParameter(() =>
+        {
+            foreach (var template in LeftTreeCollection)
+            {
+                template.IsExpandOnLeft = false;
+            }
+        });
+
+        /// <summary>
+        /// Развернуть все узлы в левом дереве
+        /// </summary>
+        public ICommand ExpandAllOnLeftCommand => new RelayCommandWithoutParameter(() =>
+        {
+            foreach (var template in LeftTreeCollection)
+            {
+                template.IsExpandOnLeft = true;
+            }
+        });
+
+        /// <summary>
+        /// Свернуть все узлы в правом дереве
+        /// </summary>
+        public ICommand CollapseAllOnRightCommand => new RelayCommandWithoutParameter(() =>
+        {
+            foreach (var viewWrapper in RightTreeCollection)
+            {
+                viewWrapper.IsExpandOnRight = false;
+            }
+        });
+
+        /// <summary>
+        /// Развернуть все узлы в правом дереве
+        /// </summary>
+        public ICommand ExpandAllOnRightCommand => new RelayCommandWithoutParameter(() =>
+        {
+            foreach (var viewWrapper in RightTreeCollection)
+            {
+                viewWrapper.IsExpandOnRight = true;
+            }
+        });
+
+        /// <summary>
+        /// Отметить все виды/шаблоны в правом дереве
+        /// </summary>
+        public ICommand CheckAllOnRightCommand => new RelayCommandWithoutParameter(() =>
+        {
+            foreach (var viewWrapper in RightTreeCollection)
+            {
+                viewWrapper.IsChecked = true;
+            }
+        });
+
+        /// <summary>
+        /// Снять отметку со всех видов/шаблонов в правом дереве
+        /// </summary>
+        public ICommand UncheckAllOnRightCommand => new RelayCommandWithoutParameter(() =>
+        {
+            foreach (var viewWrapper in RightTreeCollection)
+            {
+                viewWrapper.IsChecked = false;
+            }
+        });
+
         private void Init()
         {
             ViewTemplates.Clear();
@@ -70,55 +255,55 @@
                 .Cast<View>()
                 .Where(v => v.IsTemplate && v.AreGraphicsOverridesAllowed())
                 .OrderBy(v => v.Name);
-            
-            foreach (var viewTemplateWrapper in viewTemplates.Select(v => new ViewTemplateWrapper(v)))
+
+            foreach (var viewWrapper in viewTemplates.Select(v => new ViewWrapper(v)))
             {
-                ViewTemplates.Add(viewTemplateWrapper);
+                ViewTemplates.Add(viewWrapper);
+            }
+
+            Views.Clear();
+
+            var views = new FilteredElementCollector(_doc)
+                    .OfClass(typeof(View))
+                    .Cast<View>()
+                    .Where(v => !v.IsTemplate &&
+                                v.ViewTemplateId == ElementId.InvalidElementId &&
+                                v.AreGraphicsOverridesAllowed() &&
+                                _allowedViewTypes.Contains(v.ViewType))
+                    .OrderBy(v => v.Name);
+
+            foreach (var viewWrapper in views.Select(v => new ViewWrapper(v)))
+            {
+                Views.Add(viewWrapper);
             }
         }
 
-        private void Search()
+        private void Search(bool isOnLeft)
         {
-            var searchString = SearchString.Trim().ToUpper();
-            if (string.IsNullOrEmpty(searchString))
-            {
-                foreach (var viewTemplate in ViewTemplates)
-                {
-                    foreach (var filter in viewTemplate.Filters)
-                    {
-                        filter.Visibility = Visibility.Visible;
-                    }
+            var searchString = string.IsNullOrWhiteSpace(SearchStringOnLeft)
+                ? string.Empty
+                : SearchStringOnLeft.Trim().ToUpper();
 
-                    viewTemplate.Visibility = Visibility.Visible;
+            if (isOnLeft)
+            {
+                foreach (var viewWrapper in LeftTreeCollection)
+                {
+                    viewWrapper.ChangeVisibilityByFilteringAndSearching(searchString, ViewTypeGroupOnLeft, true);
                 }
             }
             else
             {
-                foreach (var viewTemplate in ViewTemplates)
+                foreach (var viewWrapper in RightTreeCollection)
                 {
-                    foreach (var filter in viewTemplate.Filters)
-                    {
-                        filter.Visibility = filter.NameUpperCase.Contains(searchString)
-                            ? Visibility.Visible : Visibility.Collapsed;
-                    }
-
-                    if (viewTemplate.Filters.All(f => f.Visibility == Visibility.Collapsed))
-                    {
-                        viewTemplate.Visibility = viewTemplate.NameUpperCase.Contains(searchString)
-                            ? Visibility.Visible : Visibility.Collapsed;
-                    }
-                    else
-                    {
-                        viewTemplate.Visibility = Visibility.Visible;
-                    }
+                    viewWrapper.ChangeVisibilityByFilteringAndSearching(searchString, ViewTypeGroupOnLeft, false);
                 }
             }
         }
 
         private void CopyChecked()
         {
-            var filters = ViewTemplates.SelectMany(t => t.Filters.Where(f => f.IsChecked)).ToList();
-            foreach (var viewTemplateWrapper in ViewTemplates.Where(t => t.IsChecked))
+            var filters = LeftTreeCollection.SelectMany(t => t.Filters.Where(f => f.IsChecked)).ToList();
+            foreach (var viewTemplateWrapper in RightTreeCollection.Where(t => t.IsChecked))
             {
                 foreach (var filter in filters.Where(filter => !viewTemplateWrapper.ContainsFilter(filter)))
                 {
@@ -138,22 +323,22 @@
                 {
                     tr.Start();
 
-                    foreach (var filter in ViewTemplates.SelectMany(v =>
+                    foreach (var filter in RightTreeCollection.SelectMany(v =>
                         v.Filters.Where(f => f.FilterStatus != FilterStatus.Exits)))
                     {
                         if (filter.FilterStatus == FilterStatus.New)
                         {
                             var graphicSettings =
-                                filter.OriginalParentTemplate.ViewTemplate.GetFilterOverrides(filter.FilterId);
+                                filter.OriginalParent.View.GetFilterOverrides(filter.FilterId);
                             var filterVisibility =
-                                filter.OriginalParentTemplate.ViewTemplate.GetFilterVisibility(filter.FilterId);
-                            filter.ParentTemplate.ViewTemplate.AddFilter(filter.FilterId);
-                            filter.ParentTemplate.ViewTemplate.SetFilterOverrides(filter.FilterId, graphicSettings);
-                            filter.ParentTemplate.ViewTemplate.SetFilterVisibility(filter.FilterId, filterVisibility);
+                                filter.OriginalParent.View.GetFilterVisibility(filter.FilterId);
+                            filter.Parent.View.AddFilter(filter.FilterId);
+                            filter.Parent.View.SetFilterOverrides(filter.FilterId, graphicSettings);
+                            filter.Parent.View.SetFilterVisibility(filter.FilterId, filterVisibility);
                         }
                         else if (filter.FilterStatus == FilterStatus.Remove)
                         {
-                            filter.ParentTemplate.ViewTemplate.RemoveFilter(filter.FilterId);
+                            filter.Parent.View.RemoveFilter(filter.FilterId);
                         }
                     }
 
