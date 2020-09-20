@@ -28,6 +28,11 @@
         /// <summary>
         /// Планы этажей, несущих конструкций, зон
         /// </summary>
-        FloorStructuralAreaPlans = 4
+        FloorStructuralAreaPlans = 4,
+
+        /// <summary>
+        /// Визуализированные, чертежные виды
+        /// </summary>
+        RenderingDraftingViews = 5
     }
 }

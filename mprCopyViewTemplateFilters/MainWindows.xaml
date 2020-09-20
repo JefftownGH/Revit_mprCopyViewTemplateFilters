@@ -101,6 +101,7 @@
                     <ComboBoxItem Content="{Binding Source={StaticResource Lang}, XPath=vtf2}"/>
                     <ComboBoxItem Content="{Binding Source={StaticResource Lang}, XPath=vtf3}"/>
                     <ComboBoxItem Content="{Binding Source={StaticResource Lang}, XPath=vtf4}"/>
+                    <ComboBoxItem Content="{Binding Source={StaticResource Lang}, XPath=vtf5}"/>
                 </ComboBox>
 
                 <!-- search -->
@@ -302,6 +303,7 @@
                     <ComboBoxItem Content="{Binding Source={StaticResource Lang}, XPath=vtf2}"/>
                     <ComboBoxItem Content="{Binding Source={StaticResource Lang}, XPath=vtf3}"/>
                     <ComboBoxItem Content="{Binding Source={StaticResource Lang}, XPath=vtf4}"/>
+                    <ComboBoxItem Content="{Binding Source={StaticResource Lang}, XPath=vtf5}"/>
                 </ComboBox>
 
                 <!-- search -->

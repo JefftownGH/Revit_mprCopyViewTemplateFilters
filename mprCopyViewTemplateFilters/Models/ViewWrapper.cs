@@ -1,5 +1,6 @@
 ﻿namespace mprCopyViewTemplateFilters.Models
 {
+    using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.Linq;
     using System.Windows.Input;
@@ -26,13 +27,15 @@
             IsTemplate = view.IsTemplate;
             ViewTypeGroup = GetViewTypeGroup(view);
 
-            _filters = new ObservableCollection<FilterWrapper>();
-            Filters = new ReadOnlyObservableCollection<FilterWrapper>(_filters);
-            var filterWrappers = view.GetFilters().Select(id => new FilterWrapper(this, id));
-            foreach (var filterWrapper in filterWrappers.OrderBy(f => f.Name))
+            var filters = view.GetFilters().ToList();
+            var filterWrappers = new List<FilterWrapper>();
+            foreach (var elementId in filters)
             {
-                AddFilter(filterWrapper, FilterStatus.Exits);
+                filterWrappers.Add(new FilterWrapper(this, elementId));
             }
+
+            _filters = new ObservableCollection<FilterWrapper>(filterWrappers.OrderBy(w => w.Name));
+            Filters = new ReadOnlyObservableCollection<FilterWrapper>(_filters);
         }
 
         /// <summary>
@@ -249,6 +252,9 @@
                 case ViewType.EngineeringPlan:
                 case ViewType.AreaPlan:
                     return ViewTypeGroup.FloorStructuralAreaPlans;
+                case ViewType.Rendering:
+                case ViewType.DraftingView:
+                    return ViewTypeGroup.RenderingDraftingViews;
                 default:
                     throw new System.ArgumentException("Cannot resolve view type");
             }

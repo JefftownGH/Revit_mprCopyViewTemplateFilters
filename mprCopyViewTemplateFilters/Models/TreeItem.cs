@@ -10,8 +10,8 @@
     {
         private Visibility _visibilityOnLeft;
         private Visibility _visibilityOnRight;
-        private bool _isExpandOnLeft = true;
-        private bool _isExpandOnRight = true;
+        private bool _isExpandOnLeft;
+        private bool _isExpandOnRight;
         private bool _isChecked;
 
         /// <summary>

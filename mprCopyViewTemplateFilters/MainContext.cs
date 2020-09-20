@@ -9,7 +9,6 @@
     using ModPlusAPI;
     using ModPlusAPI.Mvvm;
     using ModPlusAPI.Windows;
-    using Visibility = System.Windows.Visibility;
 
     /// <summary>
     /// Главный контекст
@@ -19,7 +18,8 @@
         private readonly ViewType[] _allowedViewTypes = new[]
         {
             ViewType.ThreeD, ViewType.Walkthrough, ViewType.CeilingPlan, ViewType.Elevation, ViewType.Section,
-            ViewType.Detail, ViewType.FloorPlan, ViewType.EngineeringPlan, ViewType.AreaPlan
+            ViewType.Detail, ViewType.FloorPlan, ViewType.EngineeringPlan, ViewType.AreaPlan, ViewType.Rendering,
+            ViewType.DraftingView
         };
 
         private readonly Document _doc;
@@ -39,7 +39,6 @@
             _doc = doc;
             ViewTemplates = new ObservableCollection<ViewWrapper>();
             Views = new ObservableCollection<ViewWrapper>();
-            Init();
         }
 
         /// <summary>
@@ -246,19 +245,33 @@
             }
         });
 
-        private void Init()
+        /// <summary>
+        /// Инициализация (чтение шаблонов и видов)
+        /// </summary>
+        public void Init()
         {
             ViewTemplates.Clear();
 
             var viewTemplates = new FilteredElementCollector(_doc)
                 .OfClass(typeof(View))
                 .Cast<View>()
-                .Where(v => v.IsTemplate && v.AreGraphicsOverridesAllowed())
-                .OrderBy(v => v.Name);
+                .Where(v => v.IsTemplate && 
+                            v.AreGraphicsOverridesAllowed() &&
+                            _allowedViewTypes.Contains(v.ViewType))
+                .OrderBy(v => v.Name)
+                .ToList();
 
-            foreach (var viewWrapper in viewTemplates.Select(v => new ViewWrapper(v)))
+            foreach (var view in viewTemplates)
             {
-                ViewTemplates.Add(viewWrapper);
+                try
+                {
+                    var viewWrapper = new ViewWrapper(view);
+                    ViewTemplates.Add(viewWrapper);
+                }
+                catch (Exception exception)
+                {
+                    ExceptionBox.Show(exception);
+                }
             }
 
             Views.Clear();
@@ -270,11 +283,20 @@
                                 v.ViewTemplateId == ElementId.InvalidElementId &&
                                 v.AreGraphicsOverridesAllowed() &&
                                 _allowedViewTypes.Contains(v.ViewType))
-                    .OrderBy(v => v.Name);
+                    .OrderBy(v => v.Name)
+                    .ToList();
 
-            foreach (var viewWrapper in views.Select(v => new ViewWrapper(v)))
+            foreach (var view in views)
             {
-                Views.Add(viewWrapper);
+                try
+                {
+                    var viewWrapper = new ViewWrapper(view);
+                    Views.Add(viewWrapper);
+                }
+                catch (Exception exception)
+                {
+                    ExceptionBox.Show(exception);
+                }
             }
         }
 

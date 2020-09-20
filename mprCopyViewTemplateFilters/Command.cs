@@ -25,6 +25,7 @@
                 {
                     DataContext = context
                 };
+                win.ContentRendered += (sender, args) => context.Init();
 
                 win.ShowDialog();
 
