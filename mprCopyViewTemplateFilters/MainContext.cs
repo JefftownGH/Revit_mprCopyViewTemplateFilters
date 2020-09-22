@@ -317,7 +317,7 @@
             {
                 foreach (var viewWrapper in RightTreeCollection)
                 {
-                    viewWrapper.ChangeVisibilityByFilteringAndSearching(searchString, ViewTypeGroupOnLeft, false);
+                    viewWrapper.ChangeVisibilityByFilteringAndSearching(searchString, ViewTypeGroupOnRight, false);
                 }
             }
         }
