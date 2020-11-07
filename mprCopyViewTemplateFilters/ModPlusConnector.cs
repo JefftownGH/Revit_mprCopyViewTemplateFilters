@@ -2,10 +2,11 @@
 {
     using System;
     using System.Collections.Generic;
-    using ModPlusAPI.Interfaces;
+    using ModPlusAPI.Abstractions;
+    using ModPlusAPI.Enums;
 
     /// <inheritdoc />
-    public class ModPlusConnector : IModPlusFunctionInterface
+    public class ModPlusConnector : IModPlusPlugin
     {
         private static ModPlusConnector _instance;
 
@@ -67,12 +68,12 @@
         /// <inheritdoc />
         public string ToolTipHelpImage => string.Empty;
 
-        /// <inheritdoc />
-        public List<string> SubFunctionsNames => new List<string>();
+        /// <inheritdoc/>
+        public List<string> SubPluginsNames => new List<string>();
 
-        /// <inheritdoc />
-        public List<string> SubFunctionsLames => new List<string>();
-
+        /// <inheritdoc/>
+        public List<string> SubPluginsLNames => new List<string>();
+        
         /// <inheritdoc />
         public List<string> SubDescriptions => new List<string>();
 
