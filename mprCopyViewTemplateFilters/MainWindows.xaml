@@ -261,7 +261,8 @@
             </StackPanel.Resources>
             <Button Command="{Binding Path=CopyCheckedCommand}"
                     ToolTip="{Binding Source={StaticResource Lang}, XPath=h4}"
-                    ToolTipService.InitialShowDelay="200">
+                    ToolTipService.InitialShowDelay="200"
+                    IsEnabled="{Binding Path=IsEnabledCopyChecked}">
                 <Viewbox Width="24" Height="24">
                     <Canvas Width="24" Height="24">
                         <Path Fill="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Button}, Path=Foreground}"
@@ -425,6 +426,7 @@
         <Button Grid.Column="0" Grid.ColumnSpan="3" Grid.Row="1"
                 HorizontalAlignment="Center"
                 Content="{Binding Source={StaticResource Lang}, XPath=apply}"
-                Command="{Binding Path=ApplyCommand}"/>
+                Command="{Binding Path=ApplyCommand}"
+                IsEnabled="{Binding Path=IsEnabledApply}"/>
     </Grid>
 </mps:ModPlusWindow>

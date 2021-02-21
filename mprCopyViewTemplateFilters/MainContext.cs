@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.ObjectModel;
+    using System.ComponentModel;
     using System.Linq;
     using System.Windows.Input;
     using Autodesk.Revit.DB;
@@ -15,7 +16,7 @@
     /// </summary>
     public class MainContext : VmBase
     {
-        private readonly ViewType[] _allowedViewTypes = new[]
+        private readonly ViewType[] _allowedViewTypes = 
         {
             ViewType.ThreeD, ViewType.Walkthrough, ViewType.CeilingPlan, ViewType.Elevation, ViewType.Section,
             ViewType.Detail, ViewType.FloorPlan, ViewType.EngineeringPlan, ViewType.AreaPlan, ViewType.Rendering,
@@ -29,6 +30,8 @@
         private ViewTypeGroup _viewTypeGroupOnRight;
         private SourceCollectionType _sourceCollectionTypeOnLeft;
         private SourceCollectionType _sourceCollectionTypeOnRight;
+        private bool _isEnabledApply;
+        private bool _isEnabledCopyChecked;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MainContext"/> class.
@@ -170,6 +173,36 @@
             : Language.GetItem(new ModPlusConnector().Name, "h16");
 
         /// <summary>
+        /// Доступность команды "Применить"
+        /// </summary>
+        public bool IsEnabledApply
+        {
+            get => _isEnabledApply;
+            set
+            {
+                if (_isEnabledApply == value)
+                    return;
+                _isEnabledApply = value;
+                OnPropertyChanged();
+            }
+        }
+
+        /// <summary>
+        /// Доступность команды "Копировать отмеченные"
+        /// </summary>
+        public bool IsEnabledCopyChecked
+        {
+            get => _isEnabledCopyChecked;
+            set
+            {
+                if (_isEnabledCopyChecked == value)
+                    return;
+                _isEnabledCopyChecked = value;
+                OnPropertyChanged();
+            }
+        }
+
+        /// <summary>
         /// Команда "Применить"
         /// </summary>
         public ICommand ApplyCommand => new RelayCommandWithoutParameter(Apply);
@@ -266,6 +299,7 @@
                 try
                 {
                     var viewWrapper = new ViewWrapper(view);
+                    SubscribeViewWrapper(viewWrapper);
                     ViewTemplates.Add(viewWrapper);
                 }
                 catch (Exception exception)
@@ -291,6 +325,7 @@
                 try
                 {
                     var viewWrapper = new ViewWrapper(view);
+                    SubscribeViewWrapper(viewWrapper);
                     Views.Add(viewWrapper);
                 }
                 catch (Exception exception)
@@ -298,6 +333,69 @@
                     ExceptionBox.Show(exception);
                 }
             }
+        }
+
+        private void SubscribeViewWrapper(ViewWrapper viewWrapper)
+        {
+            viewWrapper.OnFilterStatusChanged += (sender, args) => DetectIsEnabledApply();
+            viewWrapper.OnFilterAdded += (sender, args) => DetectIsEnabledApply();
+            viewWrapper.OnFilterRemoved += (sender, args) => DetectIsEnabledApply();
+            viewWrapper.PropertyChanged += ViewWrapperOnPropertyChanged;
+            viewWrapper.OnFilterCheckStateChanged += (sender, args) => DetectIsEnabledCopyChecked();
+        }
+
+        private void ViewWrapperOnPropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(ViewWrapper.IsChecked))
+            {
+                DetectIsEnabledCopyChecked();
+            }
+        }
+
+        private void DetectIsEnabledApply()
+        {
+            foreach (var viewWrapper in RightTreeCollection)
+            {
+                foreach (var filterWrapper in viewWrapper.Filters)
+                {
+                    if (filterWrapper.FilterStatus == FilterStatus.New ||
+                        filterWrapper.FilterStatus == FilterStatus.Remove)
+                    {
+                        IsEnabledApply = true;
+                        return;
+                    }
+                }
+            }
+
+            IsEnabledApply = false;
+        }
+
+        private void DetectIsEnabledCopyChecked()
+        {
+            var checkInLeft = false;
+            var checkInRight = false;
+            foreach (var viewWrapper in LeftTreeCollection)
+            {
+                foreach (var filterWrapper in viewWrapper.Filters)
+                {
+                    if (filterWrapper.IsChecked)
+                    {
+                        checkInLeft = true;
+                        break;
+                    }
+                }
+            }
+
+            foreach (var viewWrapper in RightTreeCollection)
+            {
+                if (viewWrapper.IsChecked)
+                {
+                    checkInRight = true;
+                    break;
+                }
+            }
+
+            IsEnabledCopyChecked = checkInLeft && checkInRight;
         }
 
         private void Search(bool isOnLeft)

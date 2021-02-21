@@ -1,7 +1,9 @@
 ﻿namespace mprCopyViewTemplateFilters.Models
 {
+    using System;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
+    using System.ComponentModel;
     using System.Linq;
     using System.Windows.Input;
     using Autodesk.Revit.DB;
@@ -31,12 +33,34 @@
             var filterWrappers = new List<FilterWrapper>();
             foreach (var elementId in filters)
             {
-                filterWrappers.Add(new FilterWrapper(this, elementId));
+                var filterWrapper = new FilterWrapper(this, elementId);
+                filterWrapper.PropertyChanged += FilterWrapperOnPropertyChanged;
+                filterWrappers.Add(filterWrapper);
             }
 
             _filters = new ObservableCollection<FilterWrapper>(filterWrappers.OrderBy(w => w.Name));
             Filters = new ReadOnlyObservableCollection<FilterWrapper>(_filters);
         }
+
+        /// <summary>
+        /// У вложенного фильтра изменился статус
+        /// </summary>
+        public event EventHandler OnFilterStatusChanged;
+
+        /// <summary>
+        /// Добавлен фильтр (уже после начальной инициализации)
+        /// </summary>
+        public event EventHandler OnFilterAdded;
+
+        /// <summary>
+        /// Удален фильтр (уже после начальной инициализации)
+        /// </summary>
+        public event EventHandler OnFilterRemoved;
+
+        /// <summary>
+        /// У вложенного фильтра изменилось состояние свойства "Отмечен" 
+        /// </summary>
+        public event EventHandler OnFilterCheckStateChanged;
 
         /// <summary>
         /// Вид
@@ -103,7 +127,9 @@
         public void AddFilter(FilterWrapper filterWrapper, FilterStatus filterStatus)
         {
             filterWrapper.FilterStatus = filterStatus;
+            filterWrapper.PropertyChanged += FilterWrapperOnPropertyChanged;
             _filters.Add(filterWrapper);
+            OnFilterAdded?.Invoke(this, EventArgs.Empty);
         }
 
         /// <summary>
@@ -114,7 +140,9 @@
         {
             if (filter.FilterStatus == FilterStatus.New)
             {
+                filter.PropertyChanged -= FilterWrapperOnPropertyChanged;
                 _filters.Remove(filter);
+                OnFilterRemoved?.Invoke(this, EventArgs.Empty);
             }
             else
             {
@@ -233,6 +261,14 @@
                         VisibilityOnRight = Visibility.Visible;
                 }
             }
+        }
+        
+        private void FilterWrapperOnPropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(FilterWrapper.FilterStatus))
+                OnFilterStatusChanged?.Invoke(this, EventArgs.Empty);
+            else if (e.PropertyName == nameof(FilterWrapper.IsChecked))
+                OnFilterCheckStateChanged?.Invoke(this, EventArgs.Empty);
         }
 
         private static ViewTypeGroup GetViewTypeGroup(View view)
